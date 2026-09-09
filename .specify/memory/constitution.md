@@ -1,50 +1,99 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- Sync Impact Report
+Version Change: 0.0.0 → 1.0.0
+Modified Principles: Initial creation from IMPLEMENTATION_PLAN
+Added Sections: Core Principles (6), Tech Stack, Development Workflow, Critical Rules, Governance
+Removed Sections: None
+Follow-up TODOs: None
+-->
+
+# Farida Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Tenant Isolation (NON-NEGOTIABLE)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Every tenant table MUST include `organization_id` as a foreign key. All queries MUST be scoped to the current organization context. Never trust browser-provided organization IDs — always resolve from authenticated session. Tenant boundaries are enforced via middleware and query scopes, not just code organization.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: Prevents cross-tenant data leakage in a multi-tenant SaaS application where organizations share the same database.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Server is Source of Truth
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+All money calculations and availability checks MUST happen server-side. No Vue-side or client-side price calculations. Frontend displays data but never computes financial or booking-critical logic.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Prevents price manipulation, ensures consistency, and maintains audit integrity for financial operations.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Append-Only Financial Records
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Payment amounts MUST NOT be edited after creation. Use refund records to correct errors. All financial mutations are recorded immutably.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: Maintains financial audit trail integrity and enables accurate reconciliation and reporting.
+
+### IV. Transactional Booking Creation
+
+Booking creation MUST use database transactions with locking to prevent double-bookings. Validate availability within the transaction before committing.
+
+**Rationale**: Prevents race conditions where multiple users could book the same property for overlapping dates simultaneously.
+
+### V. Thin Controllers, Fat Services
+
+Business logic MUST reside in service classes, not controllers. Controllers handle HTTP concerns only. Services contain domain logic and coordinate between models, policies, and external systems.
+
+**Rationale**: Improves testability, reusability, and maintainability by separating concerns cleanly.
+
+### VI. Audit Trail for Mutations
+
+Important mutations (bookings, payments, property changes) MUST be logged with user, organization, action, entity, old/new values, IP, and user agent. Audit logs are append-only and tamper-resistant.
+
+**Rationale**: Enables accountability, debugging, compliance, and forensic analysis of system changes.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Laravel 13, PHP 8.3 |
+| Frontend | Vue 3 + Inertia + TypeScript |
+| Styling | Tailwind CSS |
+| Database | MySQL |
+| Cache/Queue | Redis |
+| Storage | S3-compatible (MinIO locally) |
+| Auth | Laravel Breeze/Sanctum |
+| Authorization | spatie/laravel-permission |
+| Testing | Pest |
+| Build | Vite |
+
+## Development Workflow
+
+Build vertically — each feature is built end-to-end before moving to the next:
+
+1. Migration
+2. Model
+3. Policy
+4. Service
+5. Request validation
+6. Controller
+7. Inertia page
+8. Vue components
+9. Tests
+10. Audit/event handling
+
+This keeps every milestone usable and reduces unfinished modules.
+
+## Critical Rules
+
+1. Tenant isolation is mandatory — `organization_id` on all tenant tables
+2. Server is source of truth for money and availability
+3. Financial records are append-only — use refunds, never edit
+4. Booking creation is transactional — DB locks prevent double bookings
+5. Business logic in services, not controllers
+6. Audit trail for important mutations
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other development practices. Amendments require:
+- Documentation of the change rationale
+- Version bump following semantic versioning (MAJOR for principle removals, MINOR for additions, PATCH for clarifications)
+- Migration plan for existing code
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+All PRs and code reviews MUST verify compliance with these principles. Complexity MUST be justified. Use `docs/IMPLEMENTATION_PLAN.md` for runtime development guidance.
+
+**Version**: 1.0.0 | **Ratified**: 2026-09-08 | **Last Amended**: 2026-09-08
