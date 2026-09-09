@@ -8,18 +8,18 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Laravel 13, PHP 8.3 |
-| Frontend | Vue 3 + Inertia + TypeScript |
-| Styling | Tailwind CSS |
-| Database | MySQL |
-| Cache/Queue | Redis |
-| Storage | S3-compatible (MinIO locally) |
-| Auth | Laravel Breeze/Sanctum |
-| Authorization | spatie/laravel-permission |
-| Testing | Pest |
-| Build | Vite |
+| Layer         | Technology                    |
+| ---------------| -------------------------------|
+| Backend       | Laravel 13, PHP 8.3           |
+| Frontend      | Vue 3 + Inertia + TypeScript  |
+| Styling       | Tailwind CSS                  |
+| Database      | MySQL                         |
+| Cache/Queue   | Redis                         |
+| Storage       | S3-compatible (MinIO locally) |
+| Auth          | Laravel Breeze/Sanctum        |
+| Authorization | spatie/laravel-permission     |
+| Testing       | Pest                          |
+| Build         | Vite                          |
 
 ---
 
