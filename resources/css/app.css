@@ -1,9 +1,25 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@layer base {
+    :root {
+        --color-brand: 5 150 105;
+        --color-brand-light: 16 185 129;
+        --color-brand-dark: 4 120 87;
+        --sidebar-width: 256px;
+        --sidebar-collapsed-width: 72px;
+        --topbar-height: 64px;
+    }
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+@layer components {
+    .page-enter-active,
+    .page-leave-active {
+        transition: opacity 0.15s ease;
+    }
+    .page-enter-from,
+    .page-leave-to {
+        opacity: 0;
+    }
 }
